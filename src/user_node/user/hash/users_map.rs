@@ -3,7 +3,7 @@ use sha2::{Digest, Sha512};
 use std::convert::TryInto;
 
 pub struct UsersMap {
-    users_map: HashMap<String, [u8; 64]>
+    users_map: HashMap<String, [u8; 64]> // should be USERNAME and IP ADDRESS
 }
 
 impl UsersMap {

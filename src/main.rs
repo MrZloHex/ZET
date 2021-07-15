@@ -9,4 +9,6 @@ fn main() {
     let mut Arkasha = MrZloHex.invite("Arkasha");
 
     MrZloHex.my_friends();
+
+    MrZloHex.send_message("Arkasha", "HI!");
 }
