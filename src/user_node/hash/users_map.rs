@@ -2,13 +2,13 @@ use std::{collections::HashMap};
 use sha2::{Digest, Sha512};
 use std::convert::TryInto;
 
-pub struct Users {
+pub struct UsersMap {
     users: HashMap<String, [u8; 64]>
 }
 
-impl Users {
-    pub fn new() -> Users {
-        Users {
+impl UsersMap {
+    pub fn new() -> UsersMap {
+        UsersMap {
             users: HashMap::new()
         }
     }

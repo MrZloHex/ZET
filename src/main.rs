@@ -1,14 +1,9 @@
 #![allow(non_snake_case)]
 
-pub mod hash;
-
-use hash::users;
+mod user_node;
+use user_node::user::User;
 
 fn main() {
-    let mut users = users::Users::new();
-
-    match users.add_user("MrZlo".to_string()) {
-        Err(_) => panic!("This user existing"),
-        _ => ()
-    }
+    let mut Arkasha: User = User::new();
+    let mut MrZloHex = User::new();
 }
