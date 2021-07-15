@@ -7,12 +7,10 @@ pub struct UsersMap {
 }
 
 impl UsersMap {
-    pub fn new(username: String) -> UsersMap {
-        let mut u_m = UsersMap {
+    pub fn new() -> UsersMap {
+        UsersMap {
             users_map: HashMap::new()
-        };
-        u_m.add_user(username);
-        u_m
+        }
     }
 
     pub fn add_user(&mut self, username: String) -> Result<(), u8> {
@@ -29,8 +27,13 @@ impl UsersMap {
 
     fn user_exist(&mut self, username: String) -> bool {
         match self.users_map.get(&username) {
-            Some(_) => return false,
-            None => return true
+            Some(_) => return true,
+            None => return false
         };
     }
+
+    pub fn get_users_map(&mut self) -> HashMap<String, [u8; 64]> {
+        self.users_map.clone()
+    }
+
 }
