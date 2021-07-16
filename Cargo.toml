@@ -7,3 +7,24 @@ edition = "2018"
 
 [dependencies]
 sha2 = "0.9.5"
+
+[dependencies.libp2p]
+version = "0.31"
+features = [
+    "tcp-tokio",
+    "mdns-tokio"
+]
+
+[dependencies.tokio]
+version = "0.3"
+features = [
+    "io-util",
+    "io-std",
+    "stream",
+    "macros",
+    "rt",
+    "rt-multi-thread",
+    "fs",
+    "time",
+    "sync"
+]

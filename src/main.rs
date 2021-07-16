@@ -3,12 +3,39 @@
 mod user_node;
 use user_node::user::User;
 
-fn main() {
-    let mut MrZloHex = User::new("MrZlohex");
+use crate::user_node::user;
 
-    let mut Arkasha = MrZloHex.invite("Arkasha");
 
-    MrZloHex.my_friends();
+use libp2p::{
+    PeerId,
+    Transport,
+    identity,
+    noise::{Keypair, NoiseConfig, X25519Spec},
+    tcp::TokioTcpConfig,
+    core::upgrade,
+    mplex
+};
 
-    MrZloHex.send_message("Arkasha", "HI!");
+
+#[tokio::main]
+async fn main() {
+    let username = if let Some(uname) = std::env::args().nth(1) {
+        println!("Creating user {}", uname);
+        uname
+    } else {
+        "user".to_string()
+    };
+
+    let keys = identity::Keypair::generate_ed25519();
+    let peer_id = PeerId::from(keys.public());
+
+    let auth_keys = Keypair::<X25519Spec>::new()
+        .into_authentic(&keys)
+        .expect("Can create  auth keys");
+
+    let transport = TokioTcpConfig::new()
+        .upgrade(upgrade::Version::V1)
+        .authenticate(NoiseConfig::xx(auth_keys).into_authenticated())
+        .multiplex(mplex::MplexConfig::new())
+        .boxed();
 }

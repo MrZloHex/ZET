@@ -33,7 +33,6 @@ impl User {
         }
     }
 
-    pub fn send_message(&mut self, addressat: &str, message: &str) -> Result<(), u16> {
-        
+    pub fn send_message(&mut self, addressat: &str, message: &str) {
     }
 }
