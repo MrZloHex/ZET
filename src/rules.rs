@@ -7,6 +7,15 @@ pub enum MessageType {
     Request
 }
 
+
+
+pub struct Request;
+
+pub struct Response {
+    data: Message,
+    receiver: String
+}
+
 pub struct Message {
     mes_type: MessageType,
     data: String
@@ -17,13 +26,23 @@ pub struct MessageBehaviour {
     pub floodsub:Floodsub,
     pub mdns: TokioMdns,
     #[behaviour(ignore)]
-    response_sender: mpsc::UnboundedSender<ListResponse>
+    response_sender: mpsc::UnboundedSender<Response>
 }
 
 
 impl NetworkBehaviourEventProcess<FloodsubEvent> for MessageBehaviour {
     fn inject_event(&mut self, event: FloodsubEvent) {
+        match event {
+            FloodsubEvent::Message(message) => {
+                if message.data[0] == 1 {
 
+                }
+                else if message.data[0] == 2 {
+                    
+                }
+            },
+            _ => ()
+        }
     }
 }
 

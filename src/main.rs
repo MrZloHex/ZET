@@ -7,10 +7,21 @@ mod rules;
 
 
 
-use libp2p::{PeerId, Swarm, Transport, core::upgrade, floodsub::{Floodsub, FloodsubEvent, Topic}, identity, mdns::{TokioMdns}, mplex, noise::{Keypair, NoiseConfig, X25519Spec}, swarm::{NetworkBehaviourEventProcess, SwarmBuilder}, tcp::TokioTcpConfig};
+use libp2p::{
+    Swarm,
+    Transport,
+    core::upgrade,
+    floodsub::{Floodsub, Topic},
+    identity,
+    mdns::TokioMdns,
+    mplex,
+    noise::{Keypair, NoiseConfig, X25519Spec},
+    swarm::SwarmBuilder,
+    tcp::TokioTcpConfig
+};
+
 use tokio::{
-    fs,
-    io::AsyncBufRead,
+    io::AsyncBufReadExt,
     sync::mpsc
 };
 
@@ -63,32 +74,29 @@ async fn main() {
 
 
     loop {
-        let may_event = {
+        let evt = {
             tokio::select! {
-                line = stdin.next_line() => Some(EventType::Input(line.expect("can get line").expect("acn read line from stdin"))),
-                event = swarm.next_line => {
+                line = stdin.next_line() => Some(EventType::Input(line.expect("can get line").expect("can read line from stdin"))),
+                event = swarm.next() => {
                     println!("Unhandled Swarm Event: {:?}", event);
                     None
                 },
-                response = response_rcv.recv() => Some(EventType::Response(response.expect("response exists")))
+                response = response_rcv.recv() => Some(EventType::Response(response.expect("response exists"))),
             }
         };
 
-    //     if let Some(event) = may_event {
-    //         match event {
-    //             EventType::Response(resp) => {
-    //                 let json = serde_json::to_string(&resp).expect("can jsonify response");
-    //                 swarm.floodsub.publish(TOPIC.clone(), json.as_bytes());
-    //             }
-    //             EventType::Input(line) => match line.as_str() {
-    //                 "ls p" => handle_list_peers(&mut swarm).await,
-    //                 cmd if cmd.starts_with("ls r") => handle_list_recipes(cmd, &mut swarm).await,
-    //                 cmd if cmd.starts_with("publish r") => handle_publish_recipe(cmd).await,
-    //                 _ => println!("unknown command"),
-    //             },
-    //         }
-    //     };
-    // };
-
-
+        if let Some(event) = evt {
+            match event {
+                EventType::Response(resp) => {
+                    let json = serde_json::to_string(&resp).expect("can jsonify response");
+                    swarm.floodsub.publish(TOPIC.clone(), json.as_bytes());
+                }
+                EventType::Input(line) => match line.as_str() {
+                    "ls p" => handle_list_peers(&mut swarm).await,
+                    cmd if cmd.starts_with("send") => handle_list_recipes(cmd, &mut swarm).await,
+                    _ => error!("unknown command"),
+                },
+            }
+        }
+    }
 }
