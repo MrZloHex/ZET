@@ -32,21 +32,18 @@ async fn main() {
     let auth_keys = Keypair::<X25519Spec>::new()
         .into_authentic(&Me.get_keys())
         .expect("Can create  auth keys");
-
     let transport = TokioTcpConfig::new()
         .upgrade(upgrade::Version::V1)
         .authenticate(NoiseConfig::xx(auth_keys).into_authenticated())
         .multiplex(mplex::MplexConfig::new())
         .boxed();
-
-    let mut behavior = MessageBehaviour {
+    let mut behavior = rules::MessageBehaviour {
         floodsub: Floodsub::new(Me.get_peer_id()),
         mdns: TokioMdns::new().expect("Can create mdns"),
         response_sender,
     };
 
     behavior.floodsub.subscribe(Me.get_topic());
-
 
     let mut swarm = SwarmBuilder::new(transport, behavior, Me.get_peer_id())
         .executor(Box::new(|fut| {
