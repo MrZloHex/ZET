@@ -30,6 +30,14 @@ impl User {
         self.keys.clone()
     }
 
+    pub fn get_peer_id(&mut self) -> PeerId {
+        self.peer_id.clone()
+    }
+
+    pub fn get_topic(&mut self) -> Topic {
+        self.topic.clone()
+    }
+
     pub fn invite() {
 
     }

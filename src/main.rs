@@ -3,9 +3,11 @@
 mod user_node;
 use user_node::user::User;
 
+mod rules;
 
 
-use libp2p::{NetworkBehaviour, PeerId, Swarm, Transport, core::upgrade, floodsub::{Floodsub, FloodsubEvent, Topic}, identity, mdns::{TokioMdns}, mplex, noise::{Keypair, NoiseConfig, X25519Spec}, swarm::{NetworkBehaviourEventProcess, SwarmBuilder}, tcp::TokioTcpConfig};
+
+use libp2p::{PeerId, Swarm, Transport, core::upgrade, floodsub::{Floodsub, FloodsubEvent, Topic}, identity, mdns::{TokioMdns}, mplex, noise::{Keypair, NoiseConfig, X25519Spec}, swarm::{NetworkBehaviourEventProcess, SwarmBuilder}, tcp::TokioTcpConfig};
 use tokio::{
     fs,
     io::AsyncBufRead,
@@ -23,13 +25,12 @@ async fn main() {
         "user".to_string()
     };
 
-    let Me = User::new(username, identity::Keypair::generate_ed25519(), Topic::new("ZET"));
-
+    let mut Me = User::new(username, identity::Keypair::generate_ed25519(), Topic::new("ZET"));
     let (response_sender, mut response_rcv) = mpsc::unbounded_channel();
 
 
     let auth_keys = Keypair::<X25519Spec>::new()
-        .into_authentic(&keys)
+        .into_authentic(&Me.get_keys())
         .expect("Can create  auth keys");
 
     let transport = TokioTcpConfig::new()
@@ -39,15 +40,15 @@ async fn main() {
         .boxed();
 
     let mut behavior = MessageBehaviour {
-        floodsub: Floodsub::new(peer_id.clone()),
+        floodsub: Floodsub::new(Me.get_peer_id()),
         mdns: TokioMdns::new().expect("Can create mdns"),
         response_sender,
     };
 
-    behavior.floodsub.subscribe(topic.clone());
+    behavior.floodsub.subscribe(Me.get_topic());
 
 
-    let mut swarm = SwarmBuilder::new(transport, behavior, peer_id.clone())
+    let mut swarm = SwarmBuilder::new(transport, behavior, Me.get_peer_id())
         .executor(Box::new(|fut| {
             tokio::spawn(fut);
         }))
