@@ -1,38 +1,48 @@
 mod hash;
-use std::{collections::hash_map::Keys, future::Ready};
-
 use hash::users_map::UsersMap;
+
+
+use libp2p::{PeerId, floodsub::Topic, identity::Keypair};
 
 
 pub struct User {
     user_map: UsersMap,
     username: String,
+    keys: Keypair,
+    peer_id: PeerId,
+    topic: Topic,
     balance: u128
 }
 
 impl User {
-    pub fn new(username: &str) -> User {
+    pub fn new(username: String, key_pair: Keypair, tp: Topic) -> User {
         User {
             user_map: UsersMap::new(),
             username: username.to_string(),
+            keys: key_pair.clone(),
+            peer_id: PeerId::from(key_pair.public()),
+            topic: tp,
             balance: 0
         }
     }
 
-    pub fn invite(&mut self, username: &str) -> User {
-        match self.user_map.add_user(username.clone().to_string()) {
-            Ok(_) => (),
-            Err(_) => panic!("This user is invited")
-        };
-        User::new(username)
+    pub fn get_keys(&mut self) -> Keypair {
+        self.keys.clone()
     }
 
-    pub fn my_friends(&mut self) {
-        for user in self.user_map.get_users_map().keys() {
-            println!("{}", user);
-        }
+    pub fn invite() {
+
     }
 
-    pub fn send_message(&mut self, addressat: &str, message: &str) {
+    pub fn augment() {
+
+    }
+
+    pub fn transfer() {
+
+    }
+
+    pub fn request() {
+
     }
 }
