@@ -7,6 +7,10 @@ pub enum MessageType {
     Request
 }
 
+pub enum EventType {
+    Response(Response),
+    Input(String)
+}
 
 
 pub struct Request;
