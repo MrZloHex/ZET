@@ -94,7 +94,7 @@ async fn main() {
                 }
                 rules::EventType::Input(line) => match line.as_str() {
                     "ls p" => handlers::handle_list_peers(&mut swarm).await,
-                    cmd if cmd.starts_with("send") => handlers::handle_send_message(cmd, &mut swarm).await,
+                    cmd if cmd.starts_with("send") => handlers::handle_send_message(cmd, &mut swarm, &mut Me).await,
                     _ => println!("unknown command"),
                 },
             }

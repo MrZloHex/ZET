@@ -30,7 +30,7 @@ pub struct MessageBehaviour {
     pub floodsub:Floodsub,
     pub mdns: TokioMdns,
     #[behaviour(ignore)]
-    response_sender: mpsc::UnboundedSender<Response>
+    pub response_sender: mpsc::UnboundedSender<Response>
 }
 
 
