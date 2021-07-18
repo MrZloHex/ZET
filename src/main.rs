@@ -89,7 +89,8 @@ async fn main() {
         if let Some(event) = evt {
             match event {
                 rules::EventType::Response(resp) => {
-
+                    println!("RESPONSE");
+                    handlers::handle_send_response(resp).await;
                     // swarm.floodsub.publish( TOPIC.clone(), json.as_bytes());
                 }
                 rules::EventType::Input(line) => match line.as_str() {

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use libp2p::Swarm;
 
-use crate::{rules::MessageBehaviour, user_node::user::User};
+use crate::{rules::{MessageBehaviour, Response}, user_node::user::User};
 
 pub async fn handle_list_peers(swarm: &mut Swarm<MessageBehaviour>) {
     println!("Discovered Peers:");
@@ -22,4 +22,9 @@ pub async fn handle_send_message(cmd: &str, swarm: &mut Swarm<MessageBehaviour>,
     println!("Recepient: {}, Message: {}", peer_recipient, message);
 
     swarm.floodsub.publish(user.get_topic(), message.as_bytes());
+}
+
+pub async fn handle_send_response(response: Response) {
+    println!("Get response {}, from {}", response.data.data, response.receiver);
+
 }

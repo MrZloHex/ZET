@@ -4,7 +4,8 @@ use tokio::sync::mpsc;
 pub enum MessageType {
     Invite,
     Transfer,
-    Request
+    Request,
+    Response
 }
 
 pub enum EventType {
@@ -16,13 +17,13 @@ pub enum EventType {
 pub struct Request;
 
 pub struct Response {
-    data: Message,
-    receiver: String
+    pub data: Message,
+    pub receiver: String
 }
 
 pub struct Message {
     mes_type: MessageType,
-    data: String
+    pub data: String
 }
 
 #[derive(NetworkBehaviour)]
@@ -38,12 +39,11 @@ impl NetworkBehaviourEventProcess<FloodsubEvent> for MessageBehaviour {
     fn inject_event(&mut self, event: FloodsubEvent) {
         match event {
             FloodsubEvent::Message(message) => {
-                if message.data[0] == 1 {
-
-                }
-                else if message.data[0] == 2 {
-                    
-                }
+                println!("Received {}", String::from_utf8(message.data.clone()).unwrap());
+                respond_with_public_recipes(
+                    self.response_sender.clone(),
+            message.source.to_string(),
+                );
             },
             _ => ()
         }
@@ -67,4 +67,21 @@ impl NetworkBehaviourEventProcess<MdnsEvent> for MessageBehaviour {
             }
         }
     }
+}
+
+fn respond_with_public_recipes(sender: mpsc::UnboundedSender<Response>, receiver: String) {
+    // info!("sender: {:?}, receiver {}", sender, receiver);
+    println!("RESONDING");
+    tokio::spawn(
+        async move {
+            let response_mes = Message { mes_type: MessageType::Response, data: format!("Hi, {}", receiver.clone()) };
+            let response = Response {   
+                data: response_mes,
+                receiver
+            };
+            if let Err(e) = sender.send(response) {
+                println!("error sending response via channel, {}", e);
+            };
+        }
+    );
 }
